@@ -19,9 +19,8 @@ export async function POST(req: Request) {
       .map((link) => link.url);
 
     if (jobLinks.length > 0) {
-        console.log("Upwork job links found:", jobLinks);
-      // call the apply API
-      const response = await fetch("http://localhost:3000/api/apply", {
+      const API_BASE = process.env.VERCEL_PROJECT_PRODUCTION_URL
+      const response = await fetch(API_BASE as string, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
