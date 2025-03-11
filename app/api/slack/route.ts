@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
     if (jobLinks.length > 0) {
       const API_BASE = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-      const response = await fetch(API_BASE as string, {
+      const response = await fetch("https://slack-api-peach.vercel.app/api/apply" as string, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
