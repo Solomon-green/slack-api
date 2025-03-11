@@ -1,7 +1,23 @@
 import { NextResponse } from "next/server";
 
+interface SlackEvent {
+  type: string;
+  challenge?: string;
+  event?: {
+    type: string;
+    user: string;
+    channel: string;
+    message_ts: string;
+    links: { url: string; domain: string }[];
+    source: string;
+    unfurl_id: string;
+    is_bot_user_member: boolean;
+    event_ts: string;
+  };
+}
+
 export async function POST(req: Request) {
-  const { type, challenge, event } = await req.json();
+  const { type, challenge, event }: SlackEvent = await req.json();
 
   // Handle Slack URL verification challenge
   if (type === "url_verification") {
@@ -11,15 +27,14 @@ export async function POST(req: Request) {
   // Handle Slack events
   if (type === "event_callback") {
     // Process the event here
-    console.log("Event received:", event);
-
-    const upworkUrlRegex = /^https:\/\/www\.upwork\.com\/jobs\/[^]*[0-9a-f]{16,24}\/?$/
-    const jobLinks = event.links
-      .filter((link: { url: string }) => upworkUrlRegex.test(link.url))
-      .map((link: { url: string }) => link.url);
+    const upworkUrlRegex =
+      /^https:\/\/www\.upwork\.com\/jobs\/[^]*[0-9a-f]{16,24}\/?$/;
+    const jobLinks = event?.links
+      ?.filter((link) => upworkUrlRegex.test(link.url))
+      ?.map((link) => link.url) || [];
 
     if (jobLinks.length > 0) {
-      const API_BASE = process.env.VERCEL_PROJECT_PRODUCTION_URL
+      const API_BASE = process.env.VERCEL_PROJECT_PRODUCTION_URL;
       const response = await fetch(API_BASE as string, {
         method: "POST",
         headers: {
@@ -27,7 +42,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({ upworkUrl: jobLinks.slice(-1)[0] }),
       });
-        console.log("Apply API response:", await response.json());
+      console.log("Apply API response:", await response.json());
     }
 
     // Respond with 200 OK to acknowledge receipt of the event
