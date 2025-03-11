@@ -15,8 +15,8 @@ export async function POST(req: Request) {
 
     const upworkUrlRegex = /^https:\/\/www\.upwork\.com\/jobs\/[^]*[0-9a-f]{16,24}\/?$/
     const jobLinks = event.links
-      .filter((link) => upworkUrlRegex.test(link.url))
-      .map((link) => link.url);
+      .filter((link: { url: string }) => upworkUrlRegex.test(link.url))
+      .map((link: { url: string }) => link.url);
 
     if (jobLinks.length > 0) {
       const API_BASE = process.env.VERCEL_PROJECT_PRODUCTION_URL
